@@ -3,8 +3,8 @@ import { User } from "../model/usersM.js";
 //register new user
 export const createUser = (req, res, next) => {
   const { userName, email, password } = req.body;
-  const character_id = [];
-  const newUser = new User({ userName, email, password, character_id });
+  const characters_id = "[]";
+  const newUser = new User({ userName, email, password, characters_id });
   newUser
     .save()
     .then((info) => {
