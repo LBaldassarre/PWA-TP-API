@@ -25,12 +25,12 @@ export const logIn = async (req, res, next) => {
   const [user] = await User.find({ email: email });
   if (user) {
     if (password === user.password) {
-      res.status(200).json({ mensaje: "Log In Successful", data: user })
+      res.status(200).json({ message: "Log In Successful", data: user })
     } else {
-      res.status(400).json({ mensaje: "Wrong Password" })
+      res.status(400).json({ message: "Wrong Password" })
     }
   } else {
-    res.status(500).json({ mensaje: "Email not found" })
+    res.status(500).json({ message: "Email not found" })
   }
 };
 
