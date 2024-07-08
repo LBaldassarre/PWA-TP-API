@@ -1,5 +1,5 @@
 import { User } from "../model/usersM.js";
-import { validateUser } from "../validator/userSchema.js";
+import { validateUser, validatePartialUser } from "../validator/userSchema.js";
 
 //register new user
 export const createUser = async (req, res, next) => {
@@ -63,6 +63,37 @@ export const addFavorite = async (req, res, next) => {
     }
   );
   update
-    ? res.status(200).json({ mensaje: "Character List Updated" })
-    : res.status(500).json({ mensaje: "Internal Server Error" })
+    ? res.status(200).json({ message: "Character List Updated" })
+    : res.status(500).json({ message: "Internal Server Error" })
 };
+
+export const changePassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+  const [user] = await User.find({ email: email });
+
+  if (!user) {
+    return res
+      .status(404)
+      .json({ message: "Email not found" });
+  }
+
+  const validatedUser = validatePartialUser({email: email, password: newPassword});
+  if (validatedUser.error) {
+    const [path] = validatedUser.error.issues[0].path;
+    const error = validatedUser.error.issues[0].message;
+    const message = path + ': ' + error
+    return res.status(422).json({message: message});
+  }
+  if (!validatedUser.data.password) {
+    return res.status(422).json({message: "You must at least include one valid field"});
+  }
+  const update = await User.updateOne(
+    { email: email },
+    {
+      $set: { password: newPassword }
+    }
+  );
+  update
+    ? res.status(200).json({ message: "Password updated successfully" })
+    : res.status(500).json({ message: "Internal Server Error" })
+}
