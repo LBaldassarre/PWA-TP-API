@@ -17,7 +17,13 @@ export const createUser = (req, res, next) => {
 
 export const getAllUsers = async (req, res, next) => {
   const users = await User.find({});
-  res.status(200).json({ users });
+  res.status(200).json({data: users });
+};
+
+export const getUser = async (req, res, next) => {
+  const { email } = req.params;
+  const [ user ] = await User.find({ email: email });
+  res.status(200).json({ user });
 };
 
 export const logIn = async (req, res, next) => {
