@@ -2,6 +2,10 @@ import { User } from "../model/usersM.js";
 import { validateUser, validatePartialUser } from "../validator/userSchema.js";
 import bcrypt from 'bcrypt';
 
+export const isServerRunning = async (req, res, next) => {
+  res.status(200).json({ message: "server running" });
+}
+
 //register new user
 export const createUser = async (req, res, next) => {
   const { userName, email, password } = req.body;
