@@ -46,7 +46,8 @@ export const logIn = async (req, res, next) => {
   const { email, password } = req.body;
   const [user] = await User.find({ email: email });
   if (user) {
-    if (bcrypt.compare(password,user.password)) {
+    const isSamePassword = await (bcrypt.compare(password,user.password))
+    if (isSamePassword) {
       res.status(200).json({ message: "Log In Successful", data: user })
     } else {
       res.status(400).json({ message: "Wrong Password" })
