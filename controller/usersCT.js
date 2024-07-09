@@ -1,5 +1,6 @@
 import { User } from "../model/usersM.js";
 import { validateUser, validatePartialUser } from "../validator/userSchema.js";
+import bcrypt from 'bcrypt';
 
 //register new user
 export const createUser = async (req, res, next) => {
@@ -17,7 +18,8 @@ export const createUser = async (req, res, next) => {
     const message = path + ': ' + error
     res.status(422).json({message: message});
   } else {
-    const newUser = new User({ userName, email, password, characters_id });
+    const hashPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ userName, email, password: hashPassword, characters_id });
     newUser
       .save()
       .then((info) => {
@@ -44,7 +46,7 @@ export const logIn = async (req, res, next) => {
   const { email, password } = req.body;
   const [user] = await User.find({ email: email });
   if (user) {
-    if (password === user.password) {
+    if (bcrypt.compare(password,user.password)) {
       res.status(200).json({ message: "Log In Successful", data: user })
     } else {
       res.status(400).json({ message: "Wrong Password" })
@@ -87,10 +89,11 @@ export const changePassword = async (req, res) => {
   if (!validatedUser.data.password) {
     return res.status(422).json({message: "You must at least include one valid field"});
   }
+  const hashPassword = await bcrypt.hash(newPassword, 10);
   const update = await User.updateOne(
     { email: email },
     {
-      $set: { password: newPassword }
+      $set: { password: hashPassword }
     }
   );
   update
